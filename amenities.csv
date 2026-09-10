@@ -1,0 +1,19 @@
+village_code,national_highway,state_highway,all_weather_road,school_primary,school_middle,school_secondary,primary_health_centre,primary_health_subcentre,community_health_centre,electricity_domestic,electricity_agricultural,market_mandi,market_haat,atm,commercial_bank,mobile_coverage,internet_available,nearest_town,distance_to_town_km
+556256,no,yes,yes,yes,yes,no,0,0,0,yes,yes,no,yes,no,no,yes,no,PUNE,15
+555851,no,no,yes,yes,yes,no,0,1,0,yes,yes,no,yes,no,yes,yes,no,ALANDI,5
+555289,no,no,yes,yes,yes,no,0,1,0,yes,yes,no,no,no,no,yes,no,JUNNAR,21
+556057,no,no,yes,yes,no,no,0,0,0,yes,yes,no,no,no,no,no,no,LONAVALA,40
+555632,no,no,yes,yes,yes,yes,0,0,0,yes,yes,yes,yes,no,no,yes,yes,PUNE,34
+555913,no,no,yes,yes,yes,no,0,0,0,yes,yes,no,yes,no,no,yes,no,TALEGAON DABHADE,20
+556078,no,yes,yes,yes,no,no,0,0,0,yes,yes,no,no,no,no,yes,no,PUNE,44
+555916,no,no,yes,yes,yes,no,0,0,0,yes,yes,no,no,no,no,yes,no,TALEGAON DABHADE,25
+556671,no,no,yes,yes,yes,no,0,0,0,yes,yes,no,no,no,no,yes,no,PUNE,58
+556952,no,yes,yes,yes,yes,yes,1,0,0,yes,yes,yes,yes,no,no,yes,yes,BARAMATI,13
+555832,no,yes,yes,yes,yes,yes,0,1,0,yes,yes,yes,yes,yes,yes,yes,yes,ALANDI,18
+556479,no,no,yes,yes,yes,no,0,0,0,yes,yes,no,no,no,no,yes,no,JEJURI,13
+555465,no,no,yes,yes,yes,no,0,1,0,yes,yes,no,no,no,no,yes,no,JUNNAR,36
+556975,yes,yes,yes,yes,yes,yes,0,1,1,yes,yes,yes,yes,yes,yes,yes,yes,BARAMATI,1
+556736,no,no,yes,yes,yes,yes,0,0,0,yes,yes,no,no,no,no,yes,no,BHOR,7
+557103,no,no,yes,yes,no,no,0,0,0,yes,yes,no,no,no,no,yes,no,INDAPUR,6
+556676,no,no,yes,yes,yes,no,0,0,0,yes,yes,no,no,no,no,yes,no,PUNE,30
+556415,no,no,yes,yes,yes,yes,0,0,0,yes,yes,no,no,no,no,yes,no,DAUND,5

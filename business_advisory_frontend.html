@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Business Advisory Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B3A4B;
+    --indigo: #2C4A6E;
+    --marigold: #C77D26;
+    --marigold-dark: #8F5A19;
+    --parchment: #F6F3EC;
+    --card: #FFFFFF;
+    --sage: #4C7A5C;
+    --sage-bg: #E9F1EA;
+    --amber: #B9860B;
+    --amber-bg: #FBF1DA;
+    --rust: #9C4A3C;
+    --rust-bg: #F7E9E6;
+    --line: #DFDACB;
+    --text-muted: #6B6A60;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Public Sans', sans-serif;
+    line-height: 1.5;
+    padding: 0 0 4rem;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  header.top {
+    border-bottom: 2px solid var(--ink);
+    padding: 28px 0 20px;
+    margin-bottom: 36px;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--marigold-dark);
+    margin: 0 0 8px;
+  }
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle { color: var(--text-muted); font-size: 14.5px; margin: 0; }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .panel h2.section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--marigold-dark);
+    border: 1px solid var(--marigold-dark);
+    border-radius: 999px;
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  form .field { margin-bottom: 18px; }
+  form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  form select, form input[type="number"] {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #FFFDF9;
+    font-family: 'Public Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  form select:focus, form input:focus {
+    outline: none;
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 3px rgba(44,74,110,0.12);
+  }
+  .field-hint { font-size: 12.5px; color: var(--text-muted); margin-top: 5px; }
+  .field-error { font-size: 12.5px; color: var(--rust); margin-top: 5px; display: none; }
+  .field-error.show { display: block; }
+
+  button.submit {
+    width: 100%;
+    padding: 13px;
+    background: var(--ink);
+    color: #FFF9EF;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Public Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  button.submit:hover { background: var(--indigo); }
+  button.submit:active { transform: scale(0.99); }
+
+  .state-box { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+  .state-box.hidden { display: none; }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 3px solid var(--line);
+    border-top-color: var(--marigold);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #results { display: none; }
+  #results.show { display: block; }
+
+  .source-tag {
+    display: block;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--amber-bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 24px;
+  }
+
+  .exec-strip {
+    background: var(--ink);
+    color: #FFF9EF;
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .exec-strip .eyebrow2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--marigold);
+    margin: 0 0 8px;
+  }
+  .exec-strip h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 20px;
+    margin: 0 0 6px;
+  }
+  .exec-strip p { margin: 0; font-size: 14px; color: #D9D3C4; }
+
+  .fin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .metric-card .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .metric-card .value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--indigo);
+  }
+
+  .swot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 560px) { .swot-grid { grid-template-columns: 1fr; } }
+  .swot-card {
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--line);
+  }
+  .swot-card.strengths { background: var(--sage-bg); }
+  .swot-card.weaknesses { background: var(--rust-bg); }
+  .swot-card.opportunities { background: var(--amber-bg); }
+  .swot-card.threats { background: #EFEAF6; }
+  .swot-card h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .swot-card.strengths h4 { color: var(--sage); }
+  .swot-card.weaknesses h4 { color: var(--rust); }
+  .swot-card.opportunities h4 { color: var(--amber); }
+  .swot-card.threats h4 { color: #5A4A8A; }
+  .swot-card ul { margin: 0; padding-left: 18px; font-size: 13.5px; }
+  .swot-card li { margin-bottom: 8px; }
+
+  .report-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .report-card h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 15.5px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .badge.high { background: var(--sage-bg); color: var(--sage); }
+  .badge.medium { background: var(--amber-bg); color: var(--amber); }
+  .badge.low { background: var(--rust-bg); color: var(--rust); }
+  .badge.not_enough_data { background: #EAE8E1; color: var(--text-muted); }
+
+  .report-card p, .report-card ul { font-size: 13.8px; margin: 6px 0; }
+  .report-card ul { padding-left: 18px; }
+  .report-card li { margin-bottom: 6px; }
+
+  .cite {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--marigold-dark);
+    background: var(--amber-bg);
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: 2px;
+    white-space: nowrap;
+  }
+
+  .risk-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+  .risk-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--line);
+    padding: 6px 8px 6px 0;
+  }
+  .risk-table td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+
+  .repay-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  .repay-table th, .repay-table td {
+    text-align: left; padding: 6px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .repay-table th { font-size: 11px; text-transform: uppercase; color: var(--text-muted); }
+  .repay-table td.num, .repay-table th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; }
+
+  footer.note {
+    margin-top: 30px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="eyebrow">Ministry of Social Justice &amp; Empowerment · SIH prototype</p>
+    <h1 class="title">Business advisory assistant</h1>
+    <p class="subtitle">A feasibility check for rural micro-enterprises — grounded in village data, not guesswork.</p>
+  </header>
+
+  <div class="panel">
+    <h2 class="section-title"><span class="section-num">1</span>Tell us about the business</h2>
+    <form id="report-form">
+      <div class="field">
+        <label for="entrepreneur-name">Entrepreneur name</label>
+        <input
+          type="text"
+          id="entrepreneur-name"
+          placeholder="Enter your name"
+          maxlength="100"
+        />
+      </div>
+
+      <div class="field">
+        <label for="experience">Business experience</label>
+        <select id="experience">
+          <option value="beginner" selected>Beginner</option>
+          <option value="some experience">Some experience</option>
+          <option value="experienced">Experienced</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="language">Preferred language</label>
+        <select id="language">
+          <option value="English" selected>English</option>
+          <option value="Hindi">Hindi</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="village">Village</label>
+        <select id="village">
+          <option value="556078">Disali (Real Pune Data)</option>
+          </select>
+        <p class="field-hint" id="village-hint"></p>
+      </div>
+      <div class="field">
+        <label for="capital">Available capital (INR)</label>
+        <input type="number" id="capital" value="75000" min="0" step="1000" />
+        <p class="field-error" id="capital-error">Enter a capital amount greater than zero.</p>
+      </div>
+      <div class="field">
+        <label for="category">Business category</label>
+        <select id="category">
+          <option value="dairy">Dairy</option>
+          <option value="tailoring" selected>Tailoring</option>
+          <option value="agro-processing">Agro-processing</option>
+        </select>
+      </div>
+      <button type="submit" class="submit">Generate feasibility report</button>
+    </form>
+  </div>
+
+  <div class="state-box hidden" id="loading-box">
+    <div class="spinner"></div>
+    <p>Generating your report — this can take a few seconds…</p>
+  </div>
+
+  <div class="state-box hidden" id="error-box">
+    <p style="color: var(--rust); font-weight: 600;">Couldn't complete the request.</p>
+    <p id="error-message" style="font-size: 13.5px;"></p>
+  </div>
+
+  <div id="results"></div>
+
+  <footer class="note">Mock village data for demo purposes · AI report grounded strictly in the data shown above</footer>
+</div>
+
+<script>
+const MOCK_VILLAGES = {
+  "GP_A_001": {
+    name: "Village A", population: 1600, households: 320,
+    connectivity: { road: "kutcha_road_seasonal", market_day_access: "weekly_haat_only", internet: "2G/3G_intermittent" },
+    household_income_bands: { low: { share_of_households_pct: 55 }, typical: { share_of_households_pct: 35 }, higher: { share_of_households_pct: 10 } },
+    existing_local_enterprises: ["kirana_shop", "small_dairy_supplier"]
+  },
+  "GP_B_002": {
+    name: "Village B", population: 4200, households: 840,
+    connectivity: { road: "pucca_road_all_season", market_day_access: "daily_local_market", internet: "4G_available" },
+    household_income_bands: { low: { share_of_households_pct: 30 }, typical: { share_of_households_pct: 50 }, higher: { share_of_households_pct: 20 } },
+    existing_local_enterprises: ["tailoring_unit", "kirana_shop", "mobile_repair"]
+  },
+  "GP_C_003": {
+    name: "Village C", population: 9800, households: 1960,
+    connectivity: { road: "pucca_road_all_season", market_day_access: "daily_local_market_plus_town_access", internet: "4G_reliable" },
+    household_income_bands: { low: { share_of_households_pct: 15 }, typical: { share_of_households_pct: 45 }, higher: { share_of_households_pct: 40 } },
+    existing_local_enterprises: ["kirana_shop", "agro_processing_unit", "tailoring_unit", "mobile_repair"]
+  },
+  "556078": {
+    name: "Disali", population: 278, households: 54,
+    connectivity: { road: "kutcha_road_seasonal", market_day_access: "weekly_haat_only", internet: "2G/3G_intermittent" },
+    household_income_bands: { low: { share_of_households_pct: 50 }, typical: { share_of_households_pct: 40 }, higher: { share_of_households_pct: 10 } },
+    existing_local_enterprises: []
+  }
+};
+const VILLAGE_TARGET_CATEGORY = { "GP_A_001": "dairy", "GP_B_002": "tailoring", "GP_C_003": "agro-processing", "556078": "dairy" };
+
+const DEFAULT_ASSUMPTIONS = {
+  income_band_weights: { low: 0.5, typical: 1.0, higher: 1.0 },
+  income_band_midpoints_inr: { low: 6500, typical: 11500, higher: 20000 },
+  road_factor: { kutcha_road_seasonal: 0.7, pucca_road_all_season: 1.0 },
+  market_access_factor: { weekly_haat_only: 0.6, daily_local_market: 1.0, daily_local_market_plus_town_access: 1.2 },
+  internet_factor: { "2G/3G_intermittent": 0.7, "4G_available": 1.0, "4G_reliable": 1.1 }
+};
+
+// Cached, verified real AI reports (from actual pipeline runs) — used as offline fallback
+const CACHED_REPORTS = {
+  "GP_A_001": {
+    "market_reach": {
+      "catchment_population": 1600,
+      "catchment_description": "Serves a village population of 1,600 [village.population] across 320 total households [village.households], with an estimated 154.67 addressable households [financials.addressable_households.value].",
+      "connectivity_notes": "Accessible via seasonal kutcha road [village.connectivity.road], with trade limited to weekly haat [village.connectivity.market_day_access] and intermittent 2G/3G internet [village.connectivity.internet].",
+      "data_confidence": "high"
+    },
+
+    "opportunity_analysis": {
+      "target_income_band": "Low income (55.0% [village.income_band_shares_pct.low]) and typical income (35.0% [village.income_band_shares_pct.typical]) households.",
+      "estimated_customer_segments": [
+        "154.67 addressable households [financials.addressable_households.value]",
+        "Low-income households comprising 55.0% of total village households [village.income_band_shares_pct.low]"
+      ],
+      "demand_drivers": [
+        "Total estimated monthly demand proxy of 1,484,800.0 INR/month [financials.demand_proxy.value]",
+        "Addressable demand gap of 77.33 households per enterprise [financials.supply_gap.value]"
+      ],
+      "data_confidence": "high"
+    },
+
+    "swot": {
+      "strengths": [
+        "Available capital of 150,000.0 INR [village.available_capital]"
+      ],
+      "weaknesses": [
+        "Not enough data in records to answer"
+      ],
+      "opportunities": [
+        "Market gap allowing new entry to serve 77.33 households per enterprise [financials.supply_gap.value]",
+        "Total monthly demand proxy of 1,484,800.0 INR/month [financials.demand_proxy.value]"
+      ],
+      "threats": [
+        "Presence of 1 existing competitor small_dairy_supplier [village.existing_local_enterprises]",
+        "Seasonal transport challenges due to kutcha road infrastructure [village.connectivity.road]"
+      ]
+    },
+
+    "threats": {
+      "risk_register": [
+        {
+          "risk": "Transport disruption due to kutcha road during bad weather [village.connectivity.road]",
+          "likelihood": "high",
+          "impact": "medium",
+          "mitigation": "Not enough data in records to answer"
+        },
+        {
+          "risk": "Market competition from established local supplier small_dairy_supplier [village.existing_local_enterprises]",
+          "likelihood": "medium",
+          "impact": "medium",
+          "mitigation": "Not enough data in records to answer"
+        }
+      ]
+    },
+
+    "competitor_mapping": {
+      "competitors": [
+        {
+          "name_or_type": "small_dairy_supplier",
+          "distance_km": null,
+          "price_range": null,
+          "notes": "Existing local enterprise operating within the village [village.existing_local_enterprises]."
+        }
+      ],
+      "data_confidence": "low"
+    },
+
+    "pricing": {
+      "recommended_price_range": null,
+      "rationale": "Not enough data in records to answer",
+      "comparison_to_market": null,
+      "data_confidence": "not_enough_data"
+    },
+
+    "loan_repayment_capacity": {
+      "estimated_monthly_revenue": 148480.0,
+      "capture_rate": 0.10,
+      "operating_margin_pct": 0.18,
+      "estimated_monthly_cash_surplus": 26726.4,
+      "loan_amount": 1350000.0,
+      "quarterly_installment": 69804.56,
+      "monthly_debt_service": 23268.19,
+      "dscr": 1.15,
+      "status": "tight",
+      "explanation": "Estimated repayment capacity is tight and leaves a limited buffer over monthly debt service."
+    }
+  },
+
+  "GP_B_002": {
+    "market_reach": {
+      "catchment_population": 4200,
+      "catchment_description": "Serves a village population of 4,200 [village.population] across 840 households [village.households].",
+      "connectivity_notes": "Located in an area with pucca_road_all_season [village.connectivity.road], daily_local_market access [village.connectivity.market_day_access], and 4G_available internet [village.connectivity.internet].",
+      "data_confidence": "high"
+    },
+
+    "opportunity_analysis": {
+      "target_income_band": "Typical income band comprising 50.0% of village, low at 30.0%, and higher at 20.0% [village.income_band_shares_pct]",
+      "estimated_customer_segments": [
+        "714 addressable households [financials.addressable_households.value]",
+        "Daily local market visitors [village.connectivity.market_day_access]"
+      ],
+      "demand_drivers": [
+        "Monthly market demand proxy of 8,353,800 INR [financials.demand_proxy.value]",
+        "Supply gap of 357 households per enterprise [financials.supply_gap.value]"
+      ],
+      "data_confidence": "high"
+    },
+
+    "swot": {
+      "strengths": [
+        "Available capital of 75,000 INR [village.available_capital]",
+        "All-season pucca road access [village.connectivity.road]",
+        "4G internet connectivity [village.connectivity.internet]"
+      ],
+      "weaknesses": [
+        "Not enough data in records to answer"
+      ],
+      "opportunities": [
+        "Addressable demand across 714 households [financials.addressable_households.value]",
+        "Supply gap allowing 357 households per enterprise [financials.supply_gap.value]",
+        "Presence of daily local market access [village.connectivity.market_day_access]"
+      ],
+      "threats": [
+        "Existing competition from 1 tailoring_unit [village.existing_local_enterprises]"
+      ]
+    },
+
+    "threats": {
+      "risk_register": [
+        {
+          "risk": "Competition from existing local tailoring_unit [village.existing_local_enterprises]",
+          "likelihood": "medium",
+          "impact": "medium",
+          "mitigation": "Capture target supply gap of 357 households per enterprise [financials.supply_gap.value]"
+        }
+      ]
+    },
+
+    "competitor_mapping": {
+      "competitors": [
+        {
+          "name_or_type": "tailoring_unit",
+          "distance_km": null,
+          "price_range": null,
+          "notes": "Existing local enterprise in village [village.existing_local_enterprises]"
+        }
+      ],
+      "data_confidence": "low"
+    },
+
+    "pricing": {
+      "recommended_price_range": null,
+      "rationale": "Not enough data in records to answer",
+      "comparison_to_market": null,
+      "data_confidence": "not_enough_data"
+    },
+
+    "loan_repayment_capacity": {
+      "estimated_monthly_revenue": 668304.0,
+      "capture_rate": 0.08,
+      "operating_margin_pct": 0.27,
+      "estimated_monthly_cash_surplus": 180442.08,
+      "loan_amount": 675000.0,
+      "quarterly_installment": 34902.28,
+      "monthly_debt_service": 11634.09,
+      "dscr": 15.51,
+      "status": "healthy",
+      "explanation": "Estimated cash surplus provides a reasonable buffer over monthly debt service."
+    }
+  },
+
+  "GP_C_003": {
+    "market_reach": {
+      "catchment_population": 9800,
+      "catchment_description": "Covers a village population of 9,800 [village.population] across 1,960 total households [village.households], with an estimated addressable household count of 1,994.3 [financials.addressable_households.value].",
+      "connectivity_notes": "Accessible via pucca_road_all_season [village.connectivity.road], daily_local_market_plus_town_access [village.connectivity.market_day_access], and supported by 4G_reliable internet connectivity [village.connectivity.internet].",
+      "data_confidence": "high"
+    },
+
+    "opportunity_analysis": {
+      "target_income_band": "Typical (45.0%) and Higher (40.0%) income households [village.income_band_shares_pct]",
+      "estimated_customer_segments": [
+        "Typical income households comprising 45.0% of village [village.income_band_shares_pct.typical]",
+        "Higher income households comprising 40.0% of village [village.income_band_shares_pct.higher]"
+      ],
+      "demand_drivers": [
+        "Monthly demand proxy calculated at 28,219,345.0 INR/month [financials.demand_proxy.value]",
+        "Addressable demand across 1,994.3 households [financials.addressable_households.value]"
+      ],
+      "data_confidence": "high"
+    },
+
+    "swot": {
+      "strengths": [
+        "Available capital of 350,000.0 INR [village.available_capital]",
+        "All-season pucca road connectivity [village.connectivity.road]",
+        "Reliable 4G internet access [village.connectivity.internet]"
+      ],
+      "weaknesses": [
+        "Not enough data in records to answer"
+      ],
+      "opportunities": [
+        "High addressable household base of 1,994.3 households [financials.addressable_households.value]",
+        "Unmet demand gap with 997.15 households per enterprise [financials.supply_gap.value]"
+      ],
+      "threats": [
+        "Presence of 1 existing agro_processing_unit in the village [financials.supply_gap.components.existing_supply_count]"
+      ]
+    },
+
+    "threats": {
+      "risk_register": [
+        {
+          "risk": "Market competition from existing agro_processing_unit [village.existing_local_enterprises]",
+          "likelihood": "medium",
+          "impact": "medium",
+          "mitigation": "Not enough data in records to answer"
+        }
+      ]
+    },
+
+    "competitor_mapping": {
+      "competitors": [
+        {
+          "name_or_type": "agro_processing_unit",
+          "distance_km": null,
+          "price_range": null,
+          "notes": "Existing local enterprise in village [village.existing_local_enterprises]"
+        }
+      ],
+      "data_confidence": "low"
+    },
+
+    "pricing": {
+      "recommended_price_range": null,
+      "rationale": "Not enough data in records to answer",
+      "comparison_to_market": null,
+      "data_confidence": "not_enough_data"
+    },
+
+    "loan_repayment_capacity": {
+      "estimated_monthly_revenue": 1693160.7,
+      "capture_rate": 0.06,
+      "operating_margin_pct": 0.20,
+      "estimated_monthly_cash_surplus": 338632.14,
+      "loan_amount": 3150000.0,
+      "quarterly_installment": 162877.30,
+      "monthly_debt_service": 54292.43,
+      "dscr": 6.24,
+      "status": "healthy",
+      "explanation": "Estimated cash surplus provides a reasonable buffer over monthly debt service."
+    }
+  }
+};
+
+function calculateLoanDetails(marginCapital) {
+  if (marginCapital <= 0) return { eligible: false, message: "Margin capital must be strictly positive." };
+  const projectCost = marginCapital / 0.10;
+  const loanAmount = projectCost * 0.90;
+  const MICRO_LIMIT = 140000, TERM_LIMIT = 5000000;
+  let scheme, rate, years, moratoriumMonths;
+  if (projectCost <= MICRO_LIMIT) { scheme = "Micro Finance Scheme"; rate = 0.065; years = 3; moratoriumMonths = 3; }
+  else if (projectCost <= TERM_LIMIT) { scheme = "Term Loan Scheme"; rate = 0.08; years = 7; moratoriumMonths = 6; }
+  else return { eligible: false, project_cost: round2(projectCost), message: "Project cost exceeds the 50 lakh limit. Not eligible." };
+
+  const totalQ = years * 4;
+  const moratQ = Math.floor(moratoriumMonths / 3);
+  const repayQ = totalQ - moratQ;
+  const qRate = rate / 4;
+  const capPrincipal = loanAmount * Math.pow(1 + qRate, moratQ);
+  let qPayment = 0;
+  if (repayQ > 0) {
+    qPayment = (capPrincipal * qRate * Math.pow(1 + qRate, repayQ)) / (Math.pow(1 + qRate, repayQ) - 1);
+  }
+  return {
+    eligible: true, scheme_name: scheme, project_cost: round2(projectCost), loan_amount: round2(loanAmount),
+    capitalized_principal: round2(capPrincipal), quarterly_interest_rate_pct: round2(qRate * 100),
+    total_tenure_quarters: totalQ, moratorium_quarters: moratQ, repayment_quarters: repayQ,
+    quarterly_installment: round2(qPayment)
+  };
+}
+
+function buildEvidencePacket(villageId, businessCategory, availableCapital) {
+  const v = MOCK_VILLAGES[villageId];
+  const a = DEFAULT_ASSUMPTIONS;
+  const pctLow = v.household_income_bands.low.share_of_households_pct / 100;
+  const pctTyp = v.household_income_bands.typical.share_of_households_pct / 100;
+  const pctHigh = v.household_income_bands.higher.share_of_households_pct / 100;
+  const wLow = a.income_band_weights.low, wTyp = a.income_band_weights.typical, wHigh = a.income_band_weights.higher;
+  const roadVal = a.road_factor[v.connectivity.road] ?? 1.0;
+  const marketVal = a.market_access_factor[v.connectivity.market_day_access] ?? 1.0;
+  const netVal = a.internet_factor[v.connectivity.internet] ?? 1.0;
+  const midLow = a.income_band_midpoints_inr.low, midTyp = a.income_band_midpoints_inr.typical, midHigh = a.income_band_midpoints_inr.higher;
+
+  const incomeEligFrac = pctLow * wLow + pctTyp * wTyp + pctHigh * wHigh;
+  const accessFactor = (roadVal + marketVal + netVal) / 3;
+  const addressableHH = v.households * incomeEligFrac * accessFactor;
+  const weightedAvgIncome = pctLow * midLow + pctTyp * midTyp + pctHigh * midHigh;
+  const demandProxy = addressableHH * weightedAvgIncome;
+
+  const normalize = s => s.replace(/[-_]/g, " ").toLowerCase();
+  const target = normalize(businessCategory);
+  const existingCount = v.existing_local_enterprises.filter(e => normalize(e).includes(target)).length;
+  const supplyGap = addressableHH / (existingCount + 1);
+
+  return {
+    addressable_households: round2(addressableHH),
+    demand_proxy: round2(demandProxy),
+    supply_gap: round2(supplyGap),
+    existing_supply_count: existingCount
+  };
+}
+
+function round2(n) { return Math.round(n * 100) / 100; }
+function inr(n) { return "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 0 }); }
+
+function renderCitedText(text) {
+  if (!text) return "";
+  // Strip [field.path] citation tags so they never show in the UI
+  return String(text).replace(/\s*\[[^\]]+\]/g, "");
+}
+
+function confidenceBadge(level) {
+  if (!level) return "";
+  const label = level.replace(/_/g, " ");
+  return `<span class="badge ${level}">${label}</span>`;
+}
+
+const villageHints = {
+  "GP_A_001": "Low connectivity, weekly market, mostly low-income households — a constrained-opportunity case.",
+  "GP_B_002": "Balanced connectivity and income mix — a typical baseline case.",
+  "GP_C_003": "Well connected, largest population, highest-income share — the strongest-opportunity case.",
+  "556078": "Real Census Data — Disali, Pune (Pop. 278)."
+};
+
+const villageSelect = document.getElementById("village");
+const categorySelect = document.getElementById("category");
+const entrepreneurNameInput = document.getElementById("entrepreneur-name");
+const experienceSelect = document.getElementById("experience");
+const languageSelect = document.getElementById("language");
+const villageHint = document.getElementById("village-hint");
+
+function syncCategoryToVillage() {
+  const vid = villageSelect.value;
+  categorySelect.value = VILLAGE_TARGET_CATEGORY[vid];
+  villageHint.textContent = villageHints[vid];
+}
+villageSelect.addEventListener("change", syncCategoryToVillage);
+syncCategoryToVillage();
+
+const form = document.getElementById("report-form");
+const loadingBox = document.getElementById("loading-box");
+const errorBox = document.getElementById("error-box");
+const errorMessage = document.getElementById("error-message");
+const resultsBox = document.getElementById("results");
+const capitalInput = document.getElementById("capital");
+const capitalError = document.getElementById("capital-error");
+
+async function fetchLiveReport(villageId, capital, category, entrepreneurName, experience, language) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  const apiKey = window.API_KEY || "my-secret-02101431908";
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/v1/generate-report", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": apiKey
+      },
+      body: JSON.stringify({
+        village_id: villageId,
+        available_capital: capital,
+        business_category: category,
+        entrepreneur_name: entrepreneurName,
+        experience_level: experience,
+        language: language
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!res.ok) {
+      let errMsg = "HTTP " + res.status;
+      try {
+        const errBody = await res.json();
+        if (errBody && errBody.error) errMsg = errBody.error;
+      } catch (_) {}
+      console.warn("API error:", errMsg);
+      window.__lastApiError = errMsg;
+      return null;
+    }
+    const data = await res.json();
+    return {
+      source: "live",
+      financial_roadmap: data.financial_roadmap,
+      report: data.report,
+      report_error: data.report_error
+    };
+  } catch (e) {
+    clearTimeout(timeout);
+    window.__lastApiError = e.name === "AbortError" ? "Request timed out" : String(e);
+    return null;
+  }
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const villageId = villageSelect.value;
+  const capital = parseFloat(capitalInput.value);
+  const category = categorySelect.value;
+
+  const entrepreneurName = entrepreneurNameInput.value.trim();
+  const experienceLevel = experienceSelect.value;
+  const language = languageSelect.value;
+
+  if (!capital || capital <= 0) {
+    capitalError.classList.add("show");
+    return;
+  }
+  capitalError.classList.remove("show");
+
+  resultsBox.classList.remove("show");
+  errorBox.classList.add("hidden");
+  loadingBox.classList.remove("hidden");
+
+  let payload = await fetchLiveReport(villageId, capital, category, entrepreneurName, experienceLevel, language);
+
+  if (!payload) {
+    // Offline fallback: compute financials live, use cached report
+    const financial = calculateLoanDetails(capital);
+    payload = {
+      source: "cached",
+      financial_roadmap: financial,
+      report: CACHED_REPORTS[villageId]
+    };
+  }
+
+  loadingBox.classList.add("hidden");
+  renderResults(payload, villageId);
+});
+
+capitalInput.addEventListener("input", () => capitalError.classList.remove("show"));
+
+function appendChatBubble(role, text) {
+  const box = document.getElementById("chat-messages");
+  if (!box) return;
+  const div = document.createElement("div");
+  div.style.margin = "8px 0";
+  div.innerHTML = `<strong>${role === "user" ? "You" : "Advisor"}:</strong> ${String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>")}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function wireChatUI() {
+  const input = document.getElementById("chat-input");
+  const btn = document.getElementById("chat-send");
+  const err = document.getElementById("chat-error");
+  if (!input || !btn) {
+    console.error("Chat UI elements not found");
+    return;
+  }
+
+  async function send() {
+    const q = (input.value || "").trim();
+    if (!q) return;
+    if (err) {
+      err.style.display = "none";
+      err.textContent = "";
+    }
+    input.value = "";
+    appendChatBubble("user", q);
+    btn.disabled = true;
+
+    if (!window.__lastReport) {
+      const msg = "No report loaded for chat. Generate a live report first.";
+      appendChatBubble("assistant", msg);
+      if (err) { err.textContent = msg; err.style.display = "block"; }
+      btn.disabled = false;
+      return;
+    }
+
+    const apiKey = window.API_KEY || "my-secret-02101431908";
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/v1/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": apiKey
+        },
+        body: JSON.stringify({
+          report: window.__lastReport,
+          conversation_history: window.__chatHistory || [],
+          new_question: q
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || ("HTTP " + res.status));
+      }
+      const answer = data.answer || "(empty answer)";
+      appendChatBubble("assistant", answer);
+      window.__chatHistory = window.__chatHistory || [];
+      window.__chatHistory.push({ role: "user", content: q });
+      window.__chatHistory.push({ role: "assistant", content: answer });
+    } catch (e) {
+      const msg = String(e.message || e);
+      console.error("Chat failed:", e);
+      appendChatBubble("assistant", "Error: " + msg);
+      if (err) {
+        err.textContent = msg;
+        err.style.display = "block";
+      }
+    } finally {
+      btn.disabled = false;
+      input.focus();
+    }
+  }
+
+  btn.onclick = send;
+  input.onkeydown = function (e) {
+    if (e.key === "Enter") send();
+  };
+}
+
+function renderResults(payload, villageId) {
+  const fr = payload.financial_roadmap;
+  const r = payload.report;
+  const vName = MOCK_VILLAGES[villageId].name;
+
+  let html = "";
+
+  if (payload.source === "cached") {
+    html += `<div class="source-tag" style="background:#fce8e6; border:1px solid #d93025; color:#d93025; font-weight:600;">Showing a CACHED example report — offline demo mode (live backend not reachable)</div>`;
+  } else {
+    html += `<div class="source-tag" style="background:#e6f4ea; border:1px solid #137333; color:#137333; font-weight:600;">Live Backend Report — AI successfully generated</div>`;
+  }
+
+  if (!fr.eligible) {
+    html += `<div class="exec-strip"><p class="eyebrow2">Verdict</p><h3>Not eligible under current schemes</h3><p>${fr.message}</p></div>`;
+  } else {
+    html += `<div class="exec-strip">
+      <p class="eyebrow2">Verdict</p>
+      <h3>${vName} qualifies for the ${fr.scheme_name}</h3>
+      <p>Loan of ${inr(fr.loan_amount)} at ${fr.quarterly_interest_rate_pct}% per quarter, repaid over ${fr.repayment_quarters} quarters after a ${fr.moratorium_quarters}-quarter moratorium.</p>
+    </div>`;
+
+    html += `<div class="fin-grid">
+      <div class="metric-card"><div class="label">Project cost</div><div class="value">${inr(fr.project_cost)}</div></div>
+      <div class="metric-card"><div class="label">Loan amount</div><div class="value">${inr(fr.loan_amount)}</div></div>
+      <div class="metric-card"><div class="label">Scheme</div><div class="value" style="font-size:15px;">${fr.scheme_name}</div></div>
+      <div class="metric-card"><div class="label">Quarterly installment</div><div class="value">${inr(fr.quarterly_installment)}</div></div>
+    </div>`;
+
+    html += `<div class="report-card">
+      <h4>Repayment schedule</h4>
+      <table class="repay-table">
+        <tr><th>Period</th><th class="num">Quarters</th><th class="num">Payment</th></tr>
+        <tr><td>Moratorium</td><td class="num">${fr.moratorium_quarters}</td><td class="num">₹0 (interest accrues)</td></tr>
+        <tr><td>Repayment</td><td class="num">${fr.repayment_quarters}</td><td class="num">${inr(fr.quarterly_installment)} / quarter</td></tr>
+      </table>
+    </div>`;
+  }
+
+  if (r) {
+    html += `<div class="swot-grid">
+      <div class="swot-card strengths"><h4>Strengths</h4><ul>${(r.swot.strengths||[]).map(i => `<li>${renderCitedText(i)}</li>`).join("")}</ul></div>
+      <div class="swot-card weaknesses"><h4>Weaknesses</h4><ul>${(r.swot.weaknesses||[]).map(i => `<li>${renderCitedText(i)}</li>`).join("")}</ul></div>
+      <div class="swot-card opportunities"><h4>Opportunities</h4><ul>${(r.swot.opportunities||[]).map(i => `<li>${renderCitedText(i)}</li>`).join("")}</ul></div>
+      <div class="swot-card threats"><h4>Threats</h4><ul>${(r.swot.threats||[]).map(i => `<li>${renderCitedText(i)}</li>`).join("")}</ul></div>
+    </div>`;
+
+    const lrc = r.loan_repayment_capacity;
+    if (lrc && lrc.status !== "not_available") {
+      let statusColor = lrc.status === 'weak' ? 'var(--rust)' : (lrc.status === 'tight' ? 'var(--amber)' : 'var(--sage)');
+      html += `<div class="report-card">
+        <h4>Loan Repayment Capacity ${confidenceBadge('high')}</h4>
+        <div class="fin-grid">
+          <div class="metric-card"><div class="label">Est. Monthly Rev</div><div class="value">${inr(lrc.estimated_monthly_revenue)}</div></div>
+          <div class="metric-card"><div class="label">Cash Surplus</div><div class="value">${inr(lrc.estimated_monthly_cash_surplus)}</div></div>
+          <div class="metric-card"><div class="label">Loan Amount</div><div class="value">${inr(lrc.loan_amount)}</div></div>
+          <div class="metric-card"><div class="label">Quarterly Installment</div><div class="value">${inr(lrc.quarterly_installment)}</div></div>
+          <div class="metric-card"><div class="label">Monthly Debt Svc</div><div class="value">${inr(lrc.monthly_debt_service)}</div></div>
+          <div class="metric-card"><div class="label">DSCR</div><div class="value">${lrc.dscr}</div></div>
+        </div>
+        <p><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: 600; text-transform: capitalize;">${lrc.status}</span></p>
+        <p>${renderCitedText(lrc.explanation || "")}</p>
+        <p style="font-size: 12.5px; color: var(--text-muted); background: var(--amber-bg); padding: 8px; border-radius: 6px; margin-top: 10px;">
+          <strong>Formula:</strong> DSCR = Cash Surplus ÷ Monthly Debt Service<br>
+          <strong>Assumptions:</strong> Capture rate: ${(lrc.capture_rate * 100).toFixed(1)}%, Operating margin: ${(lrc.operating_margin_pct * 100).toFixed(1)}%
+        </p>
+      </div>`;
+    } else if (lrc && lrc.status === "not_available") {
+      html += `<div class="report-card">
+        <h4>Loan Repayment Capacity</h4>
+        <p><em>Not available: ${lrc.explanation}</em></p>
+      </div>`;
+    }
+    
+    const mr = r.market_reach;
+    html += `<div class="report-card">
+      <h4>Market reach ${confidenceBadge(mr.data_confidence)}</h4>
+      <p>${renderCitedText(mr.catchment_description)}</p>
+      <p>${renderCitedText(mr.connectivity_notes)}</p>
+    </div>`;
+
+    const oa = r.opportunity_analysis;
+    html += `<div class="report-card">
+      <h4>Opportunity analysis ${confidenceBadge(oa.data_confidence)}</h4>
+      <p>${renderCitedText(oa.target_income_band)}</p>
+      <ul>${(oa.demand_drivers||[]).map(i => `<li>${renderCitedText(i)}</li>`).join("")}</ul>
+    </div>`;
+
+    const risks = r.threats.risk_register || [];
+    html += `<div class="report-card">
+      <h4>Risk register</h4>
+      <table class="risk-table">
+        <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+        ${risks.map(row => `<tr><td>${renderCitedText(row.risk)}</td><td>${row.likelihood}</td><td>${row.impact}</td><td>${renderCitedText(row.mitigation)}</td></tr>`).join("")}
+      </table>
+    </div>`;
+
+    const cm = r.competitor_mapping;
+    html += `<div class="report-card">
+      <h4>Competitor mapping ${confidenceBadge(cm.data_confidence)}</h4>
+      <ul>${(cm.competitors||[]).map(c => `<li><strong>${c.name_or_type}</strong> — ${renderCitedText(c.notes)}</li>`).join("") || "<li>No competitor data available for this area.</li>"}</ul>
+    </div>`;
+
+    const pr = r.pricing;
+    html += `<div class="report-card">
+      <h4>Pricing ${confidenceBadge(pr.data_confidence)}</h4>
+      <p>${renderCitedText(pr.rationale)}</p>
+    </div>`;
+  } else if (payload.report_error) {
+    html += `<div class="report-card"><h4>AI report unavailable</h4><p>${payload.report_error}</p></div>`;
+  }
+
+  // Phase 4: chat panel — append to html BEFORE setting innerHTML
+  if (payload.report && typeof payload.report === "object") {
+    window.__lastReport = {
+      report: payload.report,
+      financial_roadmap: payload.financial_roadmap,
+      evidence_packet: payload.evidence_packet || null
+    };
+    window.__chatHistory = [];
+    html += `
+      <div class="report-card" id="chat-panel" style="margin-top:24px">
+        <h4>Ask about this report</h4>
+        <div id="chat-messages" style="max-height:260px;overflow:auto;margin:12px 0;padding:8px;background:#f7f6f2;border-radius:8px;font-size:14px"></div>
+        <div style="display:flex;gap:8px">
+          <input id="chat-input" type="text" placeholder="e.g. Why is the supply gap this high?"
+            style="flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:8px" />
+          <button type="button" id="chat-send" style="padding:10px 16px;border:none;border-radius:8px;background:#1a3a2a;color:#fff;cursor:pointer">Send</button>
+        </div>
+        <p id="chat-error" style="color:#a33;font-size:13px;margin-top:8px;display:none"></p>
+      </div>`;
+  }
+
+  resultsBox.innerHTML = html;
+  resultsBox.classList.add("show");
+  resultsBox.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  if (payload.report && typeof payload.report === "object") {
+    wireChatUI();
+  }
+}
+</script>
+</body>
+</html>

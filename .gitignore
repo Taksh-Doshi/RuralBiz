@@ -1,0 +1,46 @@
+# Environment & secrets
+.env
+.env.local
+.env*.local
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.npm
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs & temp
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+# FastAPI / uvicorn
+*.db
+*.sqlite3
